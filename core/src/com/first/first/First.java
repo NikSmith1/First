@@ -86,7 +86,7 @@ public class First extends ApplicationAdapter {
 //			if (i >= 10 && i < 20) batch.draw(charBraille[i], (i-10)*60+10, 600, 50, 50*103/59f);
 //			if (i >= 20 && i < 26) batch.draw(charBraille[i], (i-20)*60+10, 500, 50, 50*103/59f);
 //		}
-		if (!Objects.equals(keyboard.text, "")) batch.draw(charBraille[numberOfChar], 300, 600, 200, 200*103/59f);
+		if (!Objects.equals(keyboard.text, "")) batch.draw(charBraille[numberOfChar], SCR_WIDTH/2f-150, 700, 300, 300*103/59f);
 		batch.end();
 	}
 

@@ -100,7 +100,7 @@ public class InputKeyboard {
         }
         // рисуем вводимый текст
         batch.draw(imgEditText, 0.25f*keyWidth+x, y-keyHeight, width-1*keyWidth-padding, keyHeight*2);
-        font2.draw(batch, text, 2*keyWidth+x+keyWidth/2, keys.get(0).letterY+keyHeight*1.7f, width-5*keyWidth-padding, Align.center, false);
+        font2.draw(batch, text, 2*keyWidth+x+keyWidth/2, keys.get(0).letterY+keyHeight*2.7f, width-5*keyWidth-padding, Align.center, false);
     }
 
     // рисуем каждую кнопку
