@@ -31,16 +31,14 @@ public class InputKeyboard {
     private BitmapFont font2;
 
     public String text = ""; // вводимый текст
-    private static final String LETTERS_EN_CAPS = "1234567890-~QWERTYUIOP+?^ASDFGHJKL;'`ZXCVBNM<> |";
-    private static final String LETTERS_EN_LOW  = "!@#$%:&*()_~qwertyuiop[]^asdfghjkl:'`zxcvbnm,. |";
-    private static final String LETTERS_RU_CAPS = "1234567890-~ЙЦУКЕНГШЩЗХЪ^ФЫВАПРОЛДЖЭ`ЯЧСМИТЬБЮЁ|";
-    private static final String LETTERS_RU_LOW  = "!@#$%:&*()_~йцукенгшщзхъ^фывапролджэ`ячсмитьбюё|";
+    private static final String LETTERS_EN_LOW  = " qwertyuiop ~ asdfghjkl ` zxcvbnm   ";
+    private static final String LETTERS_RU_LOW  = "йцукенгшщзхъ~фывапролджэ`ячсмитьбюё ";
     private String letters = LETTERS_EN_LOW;
 
     private final Texture imgAtlasKeys; // все изображения кнопок
     private final TextureRegion imgEditText; // поле ввода
     private final TextureRegion imgKeyUP, imgKeyDown; // кнопка выпуклая/вдавленная
-    private final TextureRegion imgKeyBS, imgKeyEnter, imgKeyCL, imgKeySW; // картинки управляющих кноп
+    private final TextureRegion imgKeyBS, imgKeyCL; // картинки управляющих кноп
 
     private long timeStart, timeDuration = 150; // длительность надавливания кнопки
     private int keyPressed = -1; // код нажатой кнопки
@@ -56,16 +54,14 @@ public class InputKeyboard {
         imgKeyDown = new TextureRegion(imgAtlasKeys, 312+412, 0, 312, 420);
         imgEditText = new TextureRegion(imgAtlasKeys, 112, 0, 312, 420);
         imgKeyBS = new TextureRegion(imgAtlasKeys, 312*4+366, 0, 312, 420);
-        imgKeyEnter = new TextureRegion(imgAtlasKeys, 312*2+400, 0, 312, 420);
         imgKeyCL = new TextureRegion(imgAtlasKeys, 312*5+350, 0, 312, 420);
-        imgKeySW = new TextureRegion(imgAtlasKeys, 312*3+380, 0, 312, 420);
 
         // задаём параметры клавиатуры
         width = scrWidth/21f*20; // ширина и высота клавиатуры
         height = scrHeight/5f*3;
         x = SCR_WIDTH/2f-width/2f; // координаты вывода клавиатуры
-        y = height+scrHeight/10f;
-        keyWidth = width/13; // ширина и высота каждой клавиши
+        y = height+scrHeight/5f;
+        keyWidth = width/13f; // ширина и высота каждой клавиши
         keyHeight = height/5;
         padding = 8; // отступы между кнопками
         createKBD();
@@ -74,9 +70,6 @@ public class InputKeyboard {
     // создание кнопок клавиатуры по рядам
     private void createKBD(){
         int j = 0;
-        for (int i = 0; i < 12; i++, j++)
-            keys.add(new Key(i*keyWidth+x+keyWidth/2, y-keyHeight*2, keyWidth-padding, keyHeight-padding, letters.charAt(j)));
-
         for (int i = 0; i < 13; i++, j++)
             keys.add(new Key(i*keyWidth+x, y-keyHeight*3, keyWidth-padding, keyHeight-padding, letters.charAt(j)));
 
@@ -89,9 +82,6 @@ public class InputKeyboard {
     // задаём/меняем раскладку символов на всех кнопках
     private void setCharsKBD() {
         int j = 0;
-        for (int i = 0; i < 12; i++, j++)
-            keys.get(j).letter = letters.charAt(j);
-
         for (int i = 0; i < 13; i++, j++)
             keys.get(j).letter = letters.charAt(j);
 
@@ -106,7 +96,7 @@ public class InputKeyboard {
     public void draw(SpriteBatch batch){
         // рисуем кнопки
         for (int i = 0; i < keys.size; i++) {
-            drawImgKey(batch, i, keys.get(i).x, keys.get(i).y, keys.get(i).width, keys.get(i).height);
+            if (!(keys.get(i).letter + "").equals(" ")) drawImgKey(batch, i, keys.get(i).x, keys.get(i).y, keys.get(i).width, keys.get(i).height);
         }
         // рисуем вводимый текст
         batch.draw(imgEditText, 0.25f*keyWidth+x, y-keyHeight, width-1*keyWidth-padding, keyHeight*2);
@@ -132,9 +122,9 @@ public class InputKeyboard {
         // выводим символы на кнопки
         switch (letters.charAt(i)) {
             case '~': batch.draw(imgKeyBS, x+dx, y+dy, width, height); break; // backspace
-            case '^': batch.draw(imgKeyEnter, x+dx, y+dy, width, height); break; // enter
-            case '|': batch.draw(imgKeyCL, x+dx, y+dy, width, height); break; // caps lock
-            case '`': batch.draw(imgKeySW, x+dx, y+dy, width, height); break; // ru/en switcher
+//            case '^': batch.draw(imgKeyEnter, x+dx, y+dy, width, height); break; // enter
+            case '`': batch.draw(imgKeyCL, x+dx, y+dy, width, height); break; // caps lock
+//            case '|': batch.draw(imgKeySW, x+dx, y+dy, width, height); break; // ru/en switcher
             default: // все прочие символы
                 font.draw(batch, ""+keys.get(i).letter, keys.get(i).letterX+dx, keys.get(i).letterY+dy);
         }
@@ -163,28 +153,13 @@ public class InputKeyboard {
             case '~': // backspace
                 if(text.length()>0) text = text.substring(0, text.length() - 1);
                 break;
-            case '^': // enter
-                if(text.length()==0) break;
-                endOfEdit = true;
-                break;
-            case '`': // caps lock
-                if(letters.charAt(12) == 'Q') letters = LETTERS_EN_LOW;
-                else if(letters.charAt(12) == 'q') letters = LETTERS_EN_CAPS;
-                else if(letters.charAt(12) == 'Й') letters = LETTERS_RU_LOW;
-                else if(letters.charAt(12) == 'й') letters = LETTERS_RU_CAPS;
-                setCharsKBD();
-                break;
-            case '|': // ru/en switcher
-                if(letters.charAt(12) == 'й') letters = LETTERS_EN_LOW;
-                else if(letters.charAt(12) == 'Й') letters = LETTERS_EN_CAPS;
-                else if(letters.charAt(12) == 'q') letters = LETTERS_RU_LOW;
-                else if(letters.charAt(12) == 'Q') letters = LETTERS_RU_CAPS;
+            case '`': // ru/en switcher
+                if(letters.charAt(0) == 'й') letters = LETTERS_EN_LOW;
+                else if(letters.charAt(1) == 'q') letters = LETTERS_RU_LOW;
                 setCharsKBD();
                 break;
             default: // ввод символов
                 if(text.length()< textLength) text += letters.charAt(i);
-                if(text.length() == 1 && letters == LETTERS_EN_CAPS) letters = LETTERS_EN_LOW;
-                if(text.length() == 1 && letters == LETTERS_RU_CAPS) letters = LETTERS_RU_LOW;
                 setCharsKBD();
         }
     }
